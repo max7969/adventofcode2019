@@ -1,16 +1,6 @@
 import os
 import math
-
-os.walk("/users/pc/data/adventofcode2019")
-
-
-def base_path():
-    return os.path.join("day1")
-
-
-def get_lines(file_path):
-    file = open(os.path.join(base_path(), file_path), "r")
-    return file.readlines()
+import file_utils
 
 
 def fuel_per_module(weight):
@@ -33,18 +23,9 @@ def compute(lines, fuel_function):
     return sum
 
 
-def solution(file_path):
-    return compute(get_lines(file_path), fuel_per_module)
+def solution(path_name, file_name):
+    return compute(file_utils.get_lines(path_name, file_name), fuel_per_module)
 
 
-def solution2(file_path):
-    return compute(get_lines(file_path), fuel_per_module2)
-
-
-def main():
-    print(solution(os.path.join("inputs", "input")))
-    print(solution2(os.path.join("inputs", "input")))
-
-
-if __name__ == "__main__":
-    main()
+def solution2(path_name, file_name):
+    return compute(file_utils.get_lines(path_name, file_name), fuel_per_module2)
