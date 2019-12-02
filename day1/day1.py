@@ -1,6 +1,6 @@
 import os
 import math
-from lib import file_utils
+import file_utils
 
 
 def fuel_per_module(weight):
