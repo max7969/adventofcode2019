@@ -1,5 +1,4 @@
 import os
-import math
 import file_utils
 
 
@@ -39,7 +38,7 @@ def open_program(path_name, file_name):
 
 def solution(path_name, file_name):
     program = fix_program(open_program(path_name, file_name), 12, 2)
-    return compute(program)
+    return compute(program).split(",")[0]
 
 
 def solution2(path_name, file_name, solution):
