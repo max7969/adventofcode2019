@@ -15,5 +15,5 @@ def test2_day3():
 
 def test3_day3():
     result = day3.closest("R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51",
-                          "98,R91,D20,R16,D67,R40,U7,R15,U6,R7")
+                          "U98,R91,D20,R16,D67,R40,U7,R15,U6,R7")
     assert result == 135
