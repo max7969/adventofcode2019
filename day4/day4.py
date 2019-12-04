@@ -2,30 +2,32 @@ import os
 import re
 import file_utils
 
+def generate_regexp(constraint):
+    return [re.compile("".join([str(j) + "*" for j in range(i)]) + str(i) +
+                          constraint + "".join([str(j) + "*" for j in range(i + 1, 10)])) for i in range(10)]
 
-def filter_following_numbers(passwords):
+def filter_passwords_softlty(passwords):
     filtered_passwords = set()
-    regexps = [re.compile("[0-" + str(i) + "]*" + str(i) +
-                          "{2,}[" + str(i) + "-9]*") for i in range(10)]
-    for regexp in regexps:
+    for regexp in generate_regexp("{2,}"):
         filtered_passwords = filtered_passwords.union(
             set(filter(regexp.fullmatch, passwords)))
     return list(filtered_passwords)
 
-
-def filter_order(passwords):
-    for password in passwords:
-        if password[0] > password[1] or password[1] > password[2] or password[3] > password[4] or password[4] > password[5]:
-            passwords.remove(password)
-    return passwords
-
+def filter_passwords_strongly(passwords):
+    passwords = filter_passwords_softlty(passwords)
+    filtered_passwords = set()
+    for regexp in generate_regexp("{2}"):
+        filtered_passwords = filtered_passwords.union(
+            set(filter(regexp.fullmatch, passwords)))
+    return list(filtered_passwords)
 
 def possibilities(start, end):
     return [str(i) for i in range(start, end + 1)]
 
 
-def solution(start, end):
-    return len(filter_order(filter_following_numbers(possibilities(start, end))))
+def solution(start, end, filter):
+    return len(filter(possibilities(start, end)))
 
 
-print(solution(172851, 675869))
+print(solution(172851, 675869, filter_passwords_softlty))
+print(solution(172851, 675869, filter_passwords_strongly))
