@@ -1,10 +1,11 @@
 import os
 import re
-import file_utils
+
 
 def generate_regexp(constraint):
     return [re.compile("".join([str(j) + "*" for j in range(i)]) + str(i) +
-                          constraint + "".join([str(j) + "*" for j in range(i + 1, 10)])) for i in range(10)]
+                       constraint + "".join([str(j) + "*" for j in range(i + 1, 10)])) for i in range(10)]
+
 
 def filter_passwords_softlty(passwords):
     filtered_passwords = set()
@@ -13,6 +14,7 @@ def filter_passwords_softlty(passwords):
             set(filter(regexp.fullmatch, passwords)))
     return list(filtered_passwords)
 
+
 def filter_passwords_strongly(passwords):
     passwords = filter_passwords_softlty(passwords)
     filtered_passwords = set()
@@ -20,6 +22,7 @@ def filter_passwords_strongly(passwords):
         filtered_passwords = filtered_passwords.union(
             set(filter(regexp.fullmatch, passwords)))
     return list(filtered_passwords)
+
 
 def possibilities(start, end):
     return [str(i) for i in range(start, end + 1)]
