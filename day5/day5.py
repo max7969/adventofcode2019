@@ -15,6 +15,7 @@ def compute(program, input):
             addr1, addr2, addr3 = get_addrs(
                 mode1, mode2, mode3, memory, addrOp)
             if op == 4:
+                step = 2
                 output += str(memory[addr1])
             elif op == 1:
                 memory[addr3] = memory[addr1] + memory[addr2]
@@ -22,8 +23,32 @@ def compute(program, input):
             elif op == 2:
                 memory[addr3] = memory[addr1] * memory[addr2]
                 step = 4
+            elif op == 5:
+                if memory[addr1] != 0:
+                    step = 0
+                    addrOp = memory[addr2]
+                else:
+                    step = 3
+            elif op == 6:
+                if memory[addr1] == 0:
+                    step = 0
+                    addrOp = memory[addr2]
+                else:
+                    step = 3
+            elif op == 7:
+                step = 4
+                if memory[addr1] < memory[addr2]:
+                    memory[addr3] = 1
+                else:
+                    memory[addr3] = 0
+            elif op == 8:
+                step = 4
+                if memory[addr2] == memory[addr1]:
+                    memory[addr3] = 1
+                else:
+                    memory[addr3] = 0
+
         addrOp = addrOp + step
-        print(output)
     return int(output)
 
 
@@ -61,5 +86,5 @@ def open_program(path_name, file_name):
 def solution(path_name, file_name, input):
     return compute(open_program(path_name, file_name), input)
 
-
 print(solution("day5/inputs", "input", 1))
+print(solution("day5/inputs", "input", 5))
