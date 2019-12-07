@@ -93,7 +93,7 @@ def open_program(path_name, file_name):
 
 def simple_mode(program, code, input):
     for element in code:
-        program, nextInputs, addrOp, codeStop, input = compute(
+        program, _, _, _, input = compute(
             program, [int(element), input], 0)
     return input
 
