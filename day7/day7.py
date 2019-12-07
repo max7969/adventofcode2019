@@ -3,53 +3,57 @@ import file_utils
 from itertools import permutations
 
 
+def program_from_memory(memory):
+    return ",".join([str(i) for i in memory])
+
+
+def move_addrop(addrOp, step):
+    return addrOp + step
+
+
 def compute(program, inputs, addrOp):
     memory = [int(i) for i in program.split(",")]
     while memory[addrOp] != 99 or addrOp > (len(memory) - 1):
-        step = 0
         op, mode1, mode2, mode3 = read_op(memory[addrOp])
         addr1, addr2, addr3 = get_addrs(
             mode1, mode2, mode3, memory, addrOp)
         if op == 3:
-            step = 2
             memory[memory[addrOp + 1]] = inputs[0]
             inputs.pop(0)
-        if op == 4:
-            step = 2
-            return inputs, 3, ",".join([str(i) for i in memory]), addrOp + step, memory[addr1]
+            addrOp = move_addrop(addrOp, 2)
+        elif op == 4:
+            addrOp = move_addrop(addrOp, 2)
+            return program_from_memory(memory), inputs, addrOp, op, memory[addr1]
         elif op == 1:
+            addrOp = move_addrop(addrOp, 4)
             memory[addr3] = memory[addr1] + memory[addr2]
-            step = 4
         elif op == 2:
+            addrOp = move_addrop(addrOp, 4)
             memory[addr3] = memory[addr1] * memory[addr2]
-            step = 4
         elif op == 5:
             if memory[addr1] != 0:
-                step = 0
                 addrOp = memory[addr2]
             else:
-                step = 3
+                addrOp = move_addrop(addrOp, 3)
         elif op == 6:
             if memory[addr1] == 0:
-                step = 0
                 addrOp = memory[addr2]
             else:
-                step = 3
+                addrOp = move_addrop(addrOp, 3)
         elif op == 7:
-            step = 4
+            addrOp = move_addrop(addrOp, 4)
             if memory[addr1] < memory[addr2]:
                 memory[addr3] = 1
             else:
                 memory[addr3] = 0
         elif op == 8:
-            step = 4
+            addrOp = move_addrop(addrOp, 4)
             if memory[addr2] == memory[addr1]:
                 memory[addr3] = 1
             else:
                 memory[addr3] = 0
 
-        addrOp = addrOp + step
-    return [0], 99, ",".join([str(i) for i in memory]), addrOp, 0
+    return program_from_memory(memory), [0], addrOp, 99, 0
 
 
 def read_op(code):
@@ -89,7 +93,7 @@ def open_program(path_name, file_name):
 
 def simple_mode(program, code, input):
     for element in code:
-        nextInputs, codeStop, program, addrOp, input = compute(
+        program, nextInputs, addrOp, codeStop, input = compute(
             program, [int(element), input], 0)
     return input
 
@@ -105,7 +109,7 @@ def loop_mode(program, code, input):
         codeStops = []
         for element in code:
             codePrograms[element][2].append(previousOutput)
-            nextInputs, codeStop, program, addrOp, previousOutput = compute(
+            program, nextInputs, addrOp, codeStop, previousOutput = compute(
                 codePrograms[element][0], codePrograms[element][2], codePrograms[element][1])
             codePrograms[element][0] = program
             codePrograms[element][1] = addrOp
