@@ -61,5 +61,6 @@ def solution(path_name, file_name, function):
     return function("COM", graph)
 
 
-print(solution("day6/inputs", "input", count))
-print(solution("day6/inputs", "input", count_moves))
+if __name__ == "__main__":
+    print(solution("day6/inputs", "input", count))
+    print(solution("day6/inputs", "input", count_moves))

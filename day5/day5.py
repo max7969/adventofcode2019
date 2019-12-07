@@ -86,5 +86,7 @@ def open_program(path_name, file_name):
 def solution(path_name, file_name, input):
     return compute(open_program(path_name, file_name), input)
 
-print(solution("day5/inputs", "input", 1))
-print(solution("day5/inputs", "input", 5))
+
+if __name__ == "__main__":
+    print(solution("day5/inputs", "input", 1))
+    print(solution("day5/inputs", "input", 5))

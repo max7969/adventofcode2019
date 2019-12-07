@@ -32,5 +32,6 @@ def solution(start, end, filter):
     return len(filter(possibilities(start, end)))
 
 
-print(solution(172851, 675869, filter_passwords_softlty))
-print(solution(172851, 675869, filter_passwords_strongly))
+if __name__ == "__main__":
+    print(solution(172851, 675869, filter_passwords_softlty))
+    print(solution(172851, 675869, filter_passwords_strongly))

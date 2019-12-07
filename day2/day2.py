@@ -45,5 +45,6 @@ def solution2(path_name, file_name, solution):
     return code
 
 
-print(solution("day2/inputs", "input"))
-print(solution2("day2/inputs", "input", 19690720))
+if __name__ == "__main__":
+    print(solution("day2/inputs", "input"))
+    print(solution2("day2/inputs", "input", 19690720))
