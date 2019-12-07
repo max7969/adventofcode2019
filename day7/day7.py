@@ -98,27 +98,26 @@ def simple_mode(program, code, input):
     return input
 
 
-def loop_mode(program, code, input):
-    previousOutput = input
-    codeStops = []
+def init_code_programs(program, code):
     codePrograms = {}
-    lastOutput = 0
     for element in code:
-        codePrograms[element] = [program, previousOutput, [int(element)]]
-    while 99 not in codeStops:
-        codeStops = []
+        codePrograms[element] = [program, [int(element)], 0]
+    return codePrograms
+
+
+def loop_mode(program, code, input):
+    output, lastOutput = input, 0
+    codeStop = 0
+    codePrograms = init_code_programs(program, code)
+    while codeStop != 99:
         for element in code:
-            codePrograms[element][2].append(previousOutput)
-            program, nextInputs, addrOp, codeStop, previousOutput = compute(
-                codePrograms[element][0], codePrograms[element][2], codePrograms[element][1])
-            codePrograms[element][0] = program
-            codePrograms[element][1] = addrOp
-            codePrograms[element][2] = nextInputs
-            codeStops.append(codeStop)
+            codePrograms[element][1].append(output)
+            codePrograms[element][0], codePrograms[element][1], codePrograms[element][2], codeStop, output = compute(
+                codePrograms[element][0], codePrograms[element][1], codePrograms[element][2])
             if codeStop == 99:
                 break
             if element == code[4]:
-                lastOutput = previousOutput
+                lastOutput = output
     return lastOutput
 
 
