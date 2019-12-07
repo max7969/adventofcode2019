@@ -31,5 +31,6 @@ def solution2(path_name, file_name):
     return compute(file_utils.get_lines(path_name, file_name), fuel_per_module2)
 
 
-print(solution("day1/inputs", "input"))
-print(solution2("day1/inputs", "input"))
+if __name__ == "__main__":
+    print(solution("day1/inputs", "input"))
+    print(solution2("day1/inputs", "input"))
