@@ -3,12 +3,17 @@ import file_utils
 from itertools import permutations
 
 
-def get_layers(image, size):
+def convert_size(size):
     width, height = int(size.split("x")[0]), int(size.split("x")[1])
-    layers, min, max = [], 0, width * height
-    for i in range(int(len(image) / (width * height))):
+    return width, height, width * height
+
+
+def get_layers(image, size):
+    _, _, pxCount = convert_size(size)
+    layers, min, max = [], 0, pxCount
+    for _ in range(int(len(image) / (pxCount))):
         layers.append([int(image[i]) for i in range(min, max)])
-        min, max = max, max + width * height
+        min, max = max, max + pxCount
     return layers
 
 
@@ -26,41 +31,32 @@ def get_min_zero_value_layer(layers):
     return minLayer, layers.index(minLayer) + 1
 
 
-def decode_image(layers, size):
-    width, height = int(size.split("x")[0]), int(size.split("x")[1])
-    image = []
-    for i in range(width * height):
-        for layer in layers:
-            if layer[i] != 2:
-                if layer[i] == 1:
-                    image.append("X")
-                else:
-                    image.append(" ")
-                break
-    return image
+def decode_image(layers, pxCount):
+    return [str(list(filter(lambda px: px != 2, pxValues))[0]).replace("1", "X").replace("0", " ") for pxValues in [
+        [layer[i] for layer in layers] for i in range(pxCount)]]
 
 
-def print_image(image, size):
-    width, height = int(size.split("x")[0]), int(size.split("x")[1])
+def print_image(layers, size):
+    width, _, pxCount = convert_size(size)
+    image = decode_image(layers, pxCount)
     lines = [image[x:x+width] for x in range(0, len(image), width)]
+    printed_image = ""
     for line in lines:
-        print("".join([str(px) for px in line]))
+        printed_image += "".join([str(px) for px in line]) + "\n"
+    return printed_image
 
 
-def solution(path_name, file_name, size):
-    image = file_utils.get_lines(path_name, file_name)[0]
-    layers = get_layers(image, size)
+def best_layer(layers, size):
     layer, layerNumber = get_min_zero_value_layer(layers)
     return layerNumber, find_value_count(layer, 1) * find_value_count(layer, 2)
 
 
-def solution2(path_name, file_name, size):
+def solution(path_name, file_name, size, layer_function):
     image = file_utils.get_lines(path_name, file_name)[0]
     layers = get_layers(image, size)
-    image = decode_image(layers, size)
-    print_image(image, size)
+    return layer_function(layers, size)
 
 
 if __name__ == "__main__":
-    print(solution("day8/inputs", "input", "25x6"))
-    print(solution2("day8/inputs", "input", "25x6"))
+    print(solution("day8/inputs", "input", "25x6", best_layer))
+    print(solution("day8/inputs", "input", "25x6", print_image))
