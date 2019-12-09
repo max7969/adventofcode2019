@@ -13,22 +13,28 @@ def move_addrop(addrOp, step):
 
 def compute(program, inputs, addrOp):
     memory = [int(i) for i in program.split(",")]
+    output = ""
+    relativeBase = 0
     while memory[addrOp] != 99 or addrOp > (len(memory) - 1):
         op, mode1, mode2, mode3 = read_op(memory[addrOp])
         addr1, addr2, addr3 = get_addrs(
-            mode1, mode2, mode3, memory, addrOp)
+            mode1, mode2, mode3, memory, addrOp, relativeBase)
+
         if op == 3:
-            memory[memory[addrOp + 1]] = inputs[0]
+            memory[addr1] = inputs[0]
             inputs.pop(0)
             addrOp = move_addrop(addrOp, 2)
         elif op == 4:
             addrOp = move_addrop(addrOp, 2)
-            return program_from_memory(memory), inputs, addrOp, op, memory[addr1]
+            inputs.append(memory[addr1])
+            output += str(memory[addr1])
         elif op == 1:
             addrOp = move_addrop(addrOp, 4)
+            memory = extend_memory_if_needed(memory, addr3)
             memory[addr3] = memory[addr1] + memory[addr2]
         elif op == 2:
             addrOp = move_addrop(addrOp, 4)
+            memory = extend_memory_if_needed(memory, addr3)
             memory[addr3] = memory[addr1] * memory[addr2]
         elif op == 5:
             if memory[addr1] != 0:
@@ -42,18 +48,22 @@ def compute(program, inputs, addrOp):
                 addrOp = move_addrop(addrOp, 3)
         elif op == 7:
             addrOp = move_addrop(addrOp, 4)
+            memory = extend_memory_if_needed(memory, addr3)
             if memory[addr1] < memory[addr2]:
                 memory[addr3] = 1
             else:
                 memory[addr3] = 0
         elif op == 8:
             addrOp = move_addrop(addrOp, 4)
+            memory = extend_memory_if_needed(memory, addr3)
             if memory[addr2] == memory[addr1]:
                 memory[addr3] = 1
             else:
                 memory[addr3] = 0
-
-    return program_from_memory(memory), [0], addrOp, 99, 0
+        elif op == 9:
+            addrOp = move_addrop(addrOp, 2)
+            relativeBase += memory[addr1]
+    return output
 
 
 def read_op(code):
@@ -63,77 +73,46 @@ def read_op(code):
     mode3 = ((code % 100000) - mode2*1000 - mode1*100 - op) / 10000
     return op, int(mode1), int(mode2), int(mode3)
 
+def extend_memory_if_needed(memory, addr):
+    if addr >= len(memory):
+        for i in range(len(memory), addr + 1):
+            memory.append(0)
+    return memory
 
-def get_addrs(mode1, mode2, mode3, memory, addrOp):
+def get_addrs(mode1, mode2, mode3, memory, addrOp, relativeBase):
     addr1, addr2, addr3 = 0, 0, 0
     if mode1 == 0 and addrOp + 1 < len(memory):
         addr1 = memory[addrOp + 1]
-    else:
+    elif mode1 == 1:
         addr1 = addrOp + 1
+    elif mode1 == 2 and addrOp + 1 < len(memory):
+        addr1 = memory[addrOp + 1] + relativeBase
 
     if mode2 == 0 and addrOp + 2 < len(memory):
         addr2 = memory[addrOp + 2]
-    else:
+    elif mode2 == 1:
         addr2 = addrOp + 2
+    elif mode2 == 2 and addrOp + 2 < len(memory):
+        addr2 = memory[addrOp + 2] + relativeBase
 
     if mode3 == 0 and addrOp + 3 < len(memory):
         addr3 = memory[addrOp + 3]
-    else:
+    elif mode3 == 1:
         addr3 = addrOp + 3
+    elif mode3 == 2 and addrOp + 3 < len(memory):
+        addr3 = memory[addrOp + 3] + relativeBase
     return addr1, addr2, addr3
-
-
-def possibilities(phase_mode):
-    return set(permutations(phase_mode))
 
 
 def open_program(path_name, file_name):
     return file_utils.get_lines(path_name, file_name)[0]
 
 
-def simple_mode(program, code, input):
-    for element in code:
-        program, _, _, _, input = compute(
-            program, [int(element), input], 0)
-    return input
-
-
-def init_code_programs(program, code):
-    codePrograms = {}
-    for element in code:
-        codePrograms[element] = [program, [int(element)], 0]
-    return codePrograms
-
-
-def loop_mode(program, code, input):
-    output, lastOutput = input, 0
-    codeStop = 0
-    codePrograms = init_code_programs(program, code)
-    while codeStop != 99:
-        for element in code:
-            codePrograms[element][1].append(output)
-            codePrograms[element][0], codePrograms[element][1], codePrograms[element][2], codeStop, output = compute(
-                codePrograms[element][0], codePrograms[element][1], codePrograms[element][2])
-            if codeStop == 99:
-                break
-            if element == code[4]:
-                lastOutput = output
-    return lastOutput
-
-
-def solution(path_name, file_name, input, phase_mode):
-    codesToTry = possibilities(phase_mode)
+def solution(path_name, file_name, input):
     program = open_program(path_name, file_name)
-    max, goodCode = 0, list(codesToTry)[0]
-    for code in codesToTry:
-        if phase_mode == "01234":
-            signal = simple_mode(program, code, input)
-        elif phase_mode == "56789":
-            signal = loop_mode(program, code, input)
-        if signal > max:
-            max, goodCode = signal, code
-    return max, goodCode
+    return compute(program, [input], 0)
 
 
 if __name__ == "__main__":
-    print(solution("day9/inputs", "input", 0, "01234"))
+    print(solution("day9/inputs", "input", 1))
+    print(solution("day9/inputs", "input", 2))
