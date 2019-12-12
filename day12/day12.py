@@ -37,6 +37,22 @@ def play_steps(moons, stepCount):
         moons = apply_velocity(moons)
     return moons
 
+def state_as_string(moons):
+    return ",".join([str(moon) for moon in moons])
+
+def find_repetiv_state(moons):
+    states = set()
+    initial, current = state_as_string(moons), ""
+    count = 0
+    while current != initial:
+        moons = apply_gravity(moons)
+        moons = apply_velocity(moons)
+        current = state_as_string(moons)
+        count = count + 1
+        if count % 100000 == 0:
+            print(count)
+    return count
+
 def compute_moon_energy(moon):
     return (abs(moon[0]) + abs(moon[1]) + abs(moon[2])) * (abs(moon[3]) + abs(moon[4]) + abs(moon[5]))
 
@@ -51,7 +67,11 @@ def solution(path_name, file_name, stepCount):
     moons = play_steps(moons, stepCount)
     return compute_system_energy(moons)
 
+def solution2(path_name, file_name):
+    moons = extract_moons(file_utils.get_lines(path_name, file_name))
+    return find_repetiv_state(moons)
 
 if __name__ == "__main__":
     print(solution("day12/inputs", "input", 1000))
+    solution2("day12/inputs", "test_2")
    
