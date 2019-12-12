@@ -8,22 +8,21 @@ def extract_moons(lines):
     return [[int(line.group(1)), int(line.group(2)), int(line.group(3)), 0, 0, 0] for line in [re.search(r'<x=([\-0-9]*), y=([\-0-9]*), z=([\-0-9]*)>', line.rstrip()) for line in lines]]
 
 
+def update_velocity(pos1, pos2, actual):
+    if pos1 > pos2:
+        actual = actual - 1
+    elif pos1 < pos2:
+        actual = actual + 1
+    return actual
+
+
 def apply_gravity(moons):
     for moon in moons:
         for moon2 in moons:
             if moon != moon2:
-                if moon[0] > moon2[0]:
-                    moon[3] = moon[3] - 1
-                elif moon[0] < moon2[0]:
-                    moon[3] = moon[3] + 1
-                if moon[1] > moon2[1]:
-                    moon[4] = moon[4] - 1
-                elif moon[1] < moon2[1]:
-                    moon[4] = moon[4] + 1
-                if moon[2] > moon2[2]:
-                    moon[5] = moon[5] - 1
-                elif moon[2] < moon2[2]:
-                    moon[5] = moon[5] + 1
+                moon[3] = update_velocity(moon[0], moon2[0], moon[3])
+                moon[4] = update_velocity(moon[1], moon2[1], moon[4])
+                moon[5] = update_velocity(moon[2], moon2[2], moon[5])
     return moons
 
 
@@ -36,7 +35,7 @@ def apply_velocity(moons):
 
 
 def play_steps(moons, stepCount):
-    for i in range(stepCount):
+    for _ in range(stepCount):
         moons = apply_gravity(moons)
         moons = apply_velocity(moons)
     return moons
@@ -62,10 +61,7 @@ def compute_moon_energy(moon):
 
 
 def compute_system_energy(moons):
-    energy = 0
-    for moon in moons:
-        energy += compute_moon_energy(moon)
-    return energy
+    return sum([compute_moon_energy(moon) for moon in moons])
 
 
 def pgcd(a, b):
